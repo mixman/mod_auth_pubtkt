@@ -1,0 +1,7 @@
+Makedefs
+description-pak
+doc-pak/
+src/.libs/
+src/mod_auth_pubtkt.la
+src/mod_auth_pubtkt.lo
+src/mod_auth_pubtkt.slo
