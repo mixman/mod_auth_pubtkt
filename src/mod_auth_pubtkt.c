@@ -811,11 +811,10 @@ static int redirect(request_rec *r, char *location) {
 	const char *hostinfo = 0;
 	int port;
 	char sep;
-    const char *xproto = 0;
+    const char *xproto = apr_table_get(r->headers_in, "X-Forwarded-Proto");
 	
 	/* Get the scheme we use (http or https) */
 	const char *scheme = (char*)ap_http_method(r);
-    xproto = apr_table_get(r->headers_in, "X-Forwarded-Proto");
     if (xproto) {
         scheme = xproto;
     }
@@ -843,7 +842,7 @@ static int redirect(request_rec *r, char *location) {
 		   On the other hand, it's really the proxy's problem, not ours.
 		*/
 		port = ap_get_server_port(r);
-		hostinfo = port == apr_uri_default_port_for_scheme(scheme) ?
+		hostinfo = (xproto || port == apr_uri_default_port_for_scheme(scheme)) ?
 			apr_psprintf(r->pool, "%s", r->hostname) :
 			apr_psprintf(r->pool, "%s:%d", r->hostname, port);
 	}
@@ -916,9 +915,8 @@ static int auth_pubtkt_check(request_rec *r) {
 	const char *scheme = (char*)ap_http_method(r);
 	const char *current_auth = (char*)ap_auth_type(r);
 	char *url = NULL;
-    const char *xproto = 0;
+    const char *xproto = apr_table_get(r->headers_in, "X-Forwarded-Proto");
 
-    xproto = apr_table_get(r->headers_in, "X-Forwarded-Proto");
     if (xproto) {
         scheme = xproto;
     }
