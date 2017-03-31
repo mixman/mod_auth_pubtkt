@@ -812,6 +812,7 @@ static int redirect(request_rec *r, char *location) {
 	int port;
 	char sep;
     const char *xproto = apr_table_get(r->headers_in, "X-Forwarded-Proto");
+    const char *redirect_scheme = "https"; /* TODO: configurable; forced http -> https */
 	
 	/* Get the scheme we use (http or https) */
 	const char *scheme = (char*)ap_http_method(r);
@@ -846,7 +847,7 @@ static int redirect(request_rec *r, char *location) {
 			apr_psprintf(r->pool, "%s", r->hostname) :
 			apr_psprintf(r->pool, "%s:%d", r->hostname, port);
 	}
-	back = apr_psprintf(r->pool, "%s://%s%s%s", scheme, hostinfo, r->uri, query);
+	back = apr_psprintf(r->pool, "%s://%s%s%s", redirect_scheme, hostinfo, r->uri, query);
 	
 	if (conf->debug >= 1) {
 		ap_log_rerror(APLOG_MARK, APLOG_DEBUG, APR_SUCCESS, r, 
